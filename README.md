@@ -46,3 +46,13 @@ Execute       = run payload directly
 DotSource     = load payload into current runner scope, then optionally invoke a command
 DynamicModule = create an in-memory module from the payload, import it, then invoke exported command
 ```
+
+E.g.
+```
+powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\Run-EncryptedScript.ps1 `
+  -PayloadPath .\Msafe.cms `
+  -PfxPath .\Msafe_key.pfx `
+  -Mode DynamicModule `
+  -CommandName Invoke-Msafe `
+  -- -Target "server01"
+```
