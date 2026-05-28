@@ -23,6 +23,10 @@ payload-encryption-public.cer
 ```PowerShell
 powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File .\runner.ps1 -PayloadPath .\payload.cms -PfxPath .\payload.pfx
 ```
+And to pass args (after `--`):
+```
+powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File .\runner.ps1 -PayloadPath .\payload.cms -PfxPath .\payload.pfx -- -Target "server01" -Mode "Audit"
+```
 
 Only the following are required for the runner:
 ```
