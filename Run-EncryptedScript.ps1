@@ -7,6 +7,13 @@ param(
     [ValidateScript({ Test-Path $_ -PathType Leaf })]
     [string]$PfxPath,
 
+    [Parameter()]
+    [ValidateSet("Execute", "DotSource", "DynamicModule")]
+    [string]$Mode = "Execute",
+
+    [Parameter()]
+    [string]$CommandName,
+
     [Parameter(ValueFromRemainingArguments)]
     [object[]]$PayloadArgs
 )
@@ -16,9 +23,10 @@ $ErrorActionPreference = "Stop"
 
 $importedCert = $null
 $thumbprint = $null
+$pfxPassword = $null
 $payloadText = $null
 $payloadBlock = $null
-$pfxPassword = $null
+$dynamicModule = $null
 
 try {
     $pfxPassword = Read-Host "PFX password" -AsSecureString
@@ -42,9 +50,41 @@ try {
 
     $payloadBlock = [scriptblock]::Create($payloadText)
 
-    & $payloadBlock @PayloadArgs
+    switch ($Mode) {
+        "Execute" {
+            & $payloadBlock @PayloadArgs
+        }
+
+        "DotSource" {
+            # Equivalent to: . .\script.ps1
+            # Loads functions/variables into the current runner scope.
+            . $payloadBlock
+
+            if ($CommandName) {
+                $cmd = Get-Command $CommandName -ErrorAction Stop
+                & $cmd @PayloadArgs
+            }
+        }
+
+        "DynamicModule" {
+            # Equivalent-ish to importing an in-memory .psm1.
+            # Cleaner than dot-sourcing into the runner's own scope.
+            $dynamicModule = New-Module -ScriptBlock $payloadBlock
+
+            Import-Module $dynamicModule -Force -ErrorAction Stop
+
+            if ($CommandName) {
+                $cmd = Get-Command $CommandName -ErrorAction Stop
+                & $cmd @PayloadArgs
+            }
+        }
+    }
 }
 finally {
+    if ($dynamicModule) {
+        Remove-Module $dynamicModule -Force -ErrorAction SilentlyContinue
+    }
+
     if ($thumbprint) {
         Remove-Item "Cert:\CurrentUser\My\$thumbprint" `
             -Force `
@@ -56,6 +96,7 @@ finally {
     Remove-Variable pfxPassword -Force -ErrorAction SilentlyContinue
     Remove-Variable importedCert -Force -ErrorAction SilentlyContinue
     Remove-Variable thumbprint -Force -ErrorAction SilentlyContinue
+    Remove-Variable dynamicModule -Force -ErrorAction SilentlyContinue
 
     [GC]::Collect()
 }
