@@ -33,3 +33,16 @@ Only the following are required for the runner:
 payload.cms
 payload-decryption.pfx
 ```
+
+Modes:
+```
+-Mode Execute
+-Mode DotSource
+-Mode DynamicModule
+```
+Where:
+```
+Execute       = run payload directly
+DotSource     = load payload into current runner scope, then optionally invoke a command
+DynamicModule = create an in-memory module from the payload, import it, then invoke exported command
+```
