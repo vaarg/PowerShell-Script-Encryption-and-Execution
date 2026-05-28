@@ -69,13 +69,22 @@ try {
         "DynamicModule" {
             # Equivalent-ish to importing an in-memory .psm1.
             # Cleaner than dot-sourcing into the runner's own scope.
-            $dynamicModule = New-Module -ScriptBlock $payloadBlock
-
+            $moduleName = "EncryptedPayload_$PID"
+        
+            $dynamicModule = New-Module `
+                -Name $moduleName `
+                -ScriptBlock $payloadBlock
+        
             Import-Module $dynamicModule -Force -ErrorAction Stop
-
+        
             if ($CommandName) {
                 $cmd = Get-Command $CommandName -ErrorAction Stop
+        
                 & $cmd @PayloadArgs
+            }
+            else {
+                Write-Host "Dynamic module imported. Exported commands:"
+                Get-Command -Module $moduleName | Select-Object Name, CommandType, Source
             }
         }
     }
