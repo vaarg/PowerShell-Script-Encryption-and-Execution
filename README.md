@@ -53,6 +53,5 @@ powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File .\Run-EncryptedS
   -PayloadPath .\Msafe.cms `
   -PfxPath .\Msafe_key.pfx `
   -Mode DynamicModule `
-  -CommandName Invoke-PrivescAudit `
-  'List'"
+  -CommandName Invoke-PrivescAudit 'List'
 ```
