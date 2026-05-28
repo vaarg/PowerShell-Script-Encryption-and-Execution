@@ -1,4 +1,4 @@
-# New-CMPayloadPackage.ps1
+## New-CmsPayloadPackage.ps1
 
 ```PowerShell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\New-CmsPayloadPackage.ps1 -SourceScriptPath .\SensitiveScript.ps1
@@ -18,7 +18,7 @@ payload-decryption.pfx
 payload-encryption-public.cer
 ```
 
-# Run-EncryptedScript.ps1
+## Run-EncryptedScript.ps1
 
 ```PowerShell
 powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File .\runner.ps1 -PayloadPath .\payload.cms -PfxPath .\payload.pfx
